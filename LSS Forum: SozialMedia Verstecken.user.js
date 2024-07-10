@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LSS Forum: SozialMedia Verstecken
 // @namespace    leitstellenspiel.de
-// @version      1.0
+// @version      1.1
 // @description  Blendet bestimmte Forenelemente aus
 // @author       MissSobol
 // @match        https://forum.leitstellenspiel.de/*
@@ -12,28 +12,35 @@
     'use strict';
 
     // Flags zum Steuern des Ausblendens
-    const hideSocialMedia = true; // Elemente TikTok, Facebook, Insta
-    const hideToGame = true; // Element ToGame
+    const hideSocialMedia = true; // Facebook, Instagram, TikTok
+    const hideToGame = true; // Leitstellenspiel
+
+    // Href-URLs, die ausgeblendet werden sollen
+    const socialMediaHrefs = [
+        "https://www.facebook.com/Leitstellenspiel.de",
+        "https://www.instagram.com/leitstellenspiel/",
+        "https://www.tiktok.com/@leitstellenspiel.de"
+    ];
+
+    const toGameHref = "https://www.leitstellenspiel.de";
 
     // Funktion zum Verstecken der Elemente
     function hideElements() {
-        const identifiersToHide = [];
-
         if (hideSocialMedia) {
-            identifiersToHide.push("com.woltlab.wcf.generic20", "com.woltlab.wcf.generic21", "com.woltlab.wcf.generic22");
+            socialMediaHrefs.forEach(href => {
+                const elements = document.querySelectorAll(`li a[href='${href}']`);
+                elements.forEach(element => {
+                    element.closest('li').style.display = 'none';
+                });
+            });
         }
 
         if (hideToGame) {
-            identifiersToHide.push("com.woltlab.wcf.generic19");
-        }
-
-        // Iteriere durch alle zu versteckenden Identifiers und verstecke die entsprechenden Elemente
-        identifiersToHide.forEach(identifier => {
-            const elements = document.querySelectorAll(`li[data-identifier='${identifier}']`);
+            const elements = document.querySelectorAll(`li a[href='${toGameHref}']`);
             elements.forEach(element => {
-                element.style.display = 'none';
+                element.closest('li').style.display = 'none';
             });
-        });
+        }
     }
 
     // Verstecke Elemente sofort beim Start des Skripts
@@ -43,3 +50,4 @@
     new MutationObserver(hideElements).observe(document.body, { childList: true, subtree: true });
 
 })();
+
